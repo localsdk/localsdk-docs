@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LocalSDK Android Integration Guide</title>
+    <meta name="title" content="LocalSDK Android Integration Guide">
+    <meta name="description" content="Complete integration guide for LocalSDK Android - Enterprise-grade location tracking SDK with real-time updates, geofencing, and AWS IoT integration.">
+    <meta name="keywords" content="LocalSDK, Android integration, location tracking SDK, geolocation API, Android location services, location tracking guide, GPS tracking, real-time location">
+    <meta name="author" content="LocalSDK">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://localsdk.github.io/localsdk-docs/">
+    <meta property="og:title" content="LocalSDK Android Integration Guide">
+    <meta property="og:description" content="Complete integration guide for LocalSDK Android - Enterprise-grade location tracking SDK with real-time updates, geofencing, and AWS IoT integration.">
+    <meta property="og:image" content="https://localsdk.com/og-image.png">
+    <meta property="og:site_name" content="LocalSDK">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://localsdk.github.io/localsdk-docs/">
+    <meta property="twitter:title" content="LocalSDK Android Integration Guide">
+    <meta property="twitter:description" content="Complete integration guide for LocalSDK Android - Enterprise-grade location tracking SDK with real-time updates, geofencing, and AWS IoT integration.">
+    <meta property="twitter:image" content="https://localsdk.com/og-image.png">
+    
+    <!-- Theme and App Info -->
+    <meta name="theme-color" content="#9AFF00">
+    <meta name="msapplication-TileColor" content="#1a1a1a">
+    <meta name="application-name" content="LocalSDK">
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs2015.min.css">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #64748b;
+            --accent-color: #10b981;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        
+        .code-block {
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+        
+        .code-block pre {
+            margin: 0;
+            border-radius: 0.5rem;
+        }
+        
+        .code-block code {
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        
+        .section-title {
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .alert-info {
+            background-color: #f0f9ff;
+            border-color: var(--primary-color);
+            color: #1e40af;
+        }
+        
+        .alert-warning {
+            background-color: #fffbeb;
+            border-color: #f59e0b;
+            color: #92400e;
+        }
+        
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="#" style="color: var(--primary-color);">
+                <img src="logo.svg" alt="LocalSDK" height="24" class="me-2">
+                LocalSDK
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="https://github.com/localsdk" target="_blank">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-5">
+        <h1 class="section-title">LocalSDK Integration Guide</h1>
+        
+        <!-- Requirements -->
+        <section class="mb-5">
+            <h2>Requirements</h2>
+            <div class="alert alert-info">
+                <h5>System Requirements</h5>
+                <ul class="mb-0">
+                    <li>Android API Level 21+ (Android 5.0)</li>
+                    <li>Kotlin or Java project</li>
+                    <li>Android Gradle Plugin 7.0+</li>
+                    <li>Target SDK 34 (Android 14) recommended</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Installation -->
+        <section class="mb-5">
+            <h2>Installation</h2>
+            
+            <h4>Add Maven Central Repository</h4>
+            <div class="code-block">
+                <pre><code class="kotlin">// In your app-level build.gradle.kts
+repositories {
+    mavenCentral()
+}</code></pre>
+            </div>
+
+            <h4>Add Dependency</h4>
+            <div class="code-block">
+                <pre><code class="kotlin">dependencies {
+    implementation("com.localsdk:core:0.0.1-alpha")
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- Permissions -->
+        <section class="mb-5">
+            <h2>Permissions</h2>
+            <p>Add the required permissions to your <code>AndroidManifest.xml</code>:</p>
+            
+            <div class="code-block">
+                <pre><code class="xml">&lt;!-- Required location permissions --&gt;
+&lt;uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /&gt;
+&lt;uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /&gt;
+
+&lt;!-- Background location (Android 10+) --&gt;
+&lt;uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" /&gt;
+
+&lt;!-- Foreground service --&gt;
+&lt;uses-permission android:name="android.permission.FOREGROUND_SERVICE" /&gt;
+&lt;uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" /&gt;
+
+&lt;!-- Battery optimization bypass --&gt;
+&lt;uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" /&gt;</code></pre>
+            </div>
+
+            <div class="alert alert-warning">
+                <strong>Important:</strong> Background location permission requires additional steps on Android 10+. 
+                Request it separately after obtaining foreground location permission.
+            </div>
+        </section>
+
+        <!-- SDK Key Setup -->
+        <section class="mb-5">
+            <h2>SDK Key Setup</h2>
+            
+            <div class="alert alert-warning">
+                <strong>Required:</strong> You must obtain an SDK key to use LocalSDK. Contact your LocalSDK representative or visit our website to get your unique SDK key.
+            </div>
+            
+            <h4>Add SDK Key to Manifest</h4>
+            <p>Add your SDK key to your <code>AndroidManifest.xml</code> in the <code>&lt;application&gt;</code> section:</p>
+            <div class="code-block">
+                <pre><code class="xml">&lt;application&gt;
+    &lt;meta-data
+        android:name="com.localsdk.API_KEY"
+        android:value="YOUR_SDK_KEY_HERE" /&gt;
+    ...
+&lt;/application&gt;</code></pre>
+            </div>
+
+            <h4>Alternative: Programmatic Setup</h4>
+            <p>You can also initialize the SDK programmatically with your context and SDK key:</p>
+            <div class="code-block">
+                <pre><code class="kotlin">LocalSDK.initialize(this, "YOUR_SDK_KEY_HERE")</code></pre>
+            </div>
+        </section>
+
+        <!-- Basic Setup -->
+        <section class="mb-5">
+            <h2>Basic Setup</h2>
+            
+            <h4>Initialize SDK</h4>
+            <div class="code-block">
+                <pre><code class="kotlin">import com.localsdk.LocalSDK
+import com.localsdk.config.Config
+import com.localsdk.config.TrackingMode
+
+class MainActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        // Initialize SDK with key (if not in manifest)
+        LocalSDK.initialize(this, "YOUR_SDK_KEY_HERE")
+
+        // Configure SDK
+        val config = Config.Builder()
+            .setTrackingMode(TrackingMode.STANDARD)
+            .setForegroundServiceEnabled(true)
+            .setUpdateIntervalMs(5000) // 5 seconds
+            .build()
+
+        LocalSDK.setConfig(config)
+    }
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- Permission Handling -->
+        <section class="mb-5">
+            <h2>Permission Handling</h2>
+            
+            <div class="code-block">
+                <pre><code class="kotlin">import com.localsdk.permissions.LocationPermissions
+
+private fun setupLocationPermissions() {
+    // Check if permissions are granted
+    if (!LocationPermissions.checkLocationPermission(this)) {
+        // Request location permission
+        LocationPermissions.requestLocationPermission(this) { granted ->
+            if (granted) {
+                startLocationTracking()
+            } else {
+                // Handle permission denied
+                showPermissionDeniedDialog()
+            }
+        }
+    } else {
+        startLocationTracking()
+    }
+}
+
+// For background location (call after foreground permission granted)
+private fun requestBackgroundLocationPermission() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        if (!LocationPermissions.checkBackgroundLocationPermission(this)) {
+            LocationPermissions.requestBackgroundLocationPermission(this)
+        }
+    }
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- Start Tracking -->
+        <section class="mb-5">
+            <h2>Start Tracking</h2>
+            
+            <div class="code-block">
+                <pre><code class="kotlin">private fun startLocationTracking() {
+    // Set up location callback
+    LocalSDK.onLocation { location ->
+        // Handle location update
+        Log.d("Location", "Lat: ${location.latitude}, Lng: ${location.longitude}")
+        updateUI(location)
+    }
+
+    // Set up error callback
+    LocalSDK.onError { error ->
+        Log.e("LocalSDK", "Error: ${error.message}")
+        handleLocationError(error)
+    }
+
+    // Start tracking
+    LocalSDK.startTracking()
+}
+
+// Stop tracking when needed
+private fun stopLocationTracking() {
+    LocalSDK.stopTracking()
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- Advanced Configuration -->
+        <section class="mb-5">
+            <h2>Advanced Configuration</h2>
+            
+            <h4>Custom Configuration</h4>
+            <div class="code-block">
+                <pre><code class="kotlin">val config = Config.Builder()
+    .setTrackingMode(TrackingMode.HIGH_ACCURACY)
+    .setUpdateIntervalMs(10000) // 10 seconds
+    .setFastestIntervalMs(5000)  // 5 seconds
+    .setSmallestDisplacementMeters(10.0f)
+    .setForegroundServiceEnabled(true)
+    .setNotificationTitle("Location Tracking")
+    .setNotificationText("App is tracking your location")
+    .build()
+
+LocalSDK.setConfig(config)</code></pre>
+            </div>
+
+            <h4>Tracking Modes</h4>
+            <ul>
+                <li><code>TrackingMode.HIGH_ACCURACY</code> - GPS + Network (high battery usage)</li>
+                <li><code>TrackingMode.STANDARD</code> - Balanced accuracy and battery (recommended)</li>
+                <li><code>TrackingMode.LOW_POWER</code> - Network only (low battery usage)</li>
+            </ul>
+        </section>
+
+        <!-- Battery Optimization -->
+        <section class="mb-5">
+            <h2>Battery Optimization</h2>
+            
+            <div class="code-block">
+                <pre><code class="kotlin">import com.localsdk.permissions.BatteryOptimizations
+
+private fun handleBatteryOptimization() {
+    if (!BatteryOptimizations.isIgnoringBatteryOptimizations(this)) {
+        // Show dialog explaining why this is needed
+        showBatteryOptimizationDialog {
+            BatteryOptimizations.requestIgnoreBatteryOptimizations(this)
+        }
+    }
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- Complete Example -->
+        <section class="mb-5">
+            <h2>Complete Example</h2>
+            
+            <div class="code-block">
+                <pre><code class="kotlin">class MainActivity : AppCompatActivity() {
+    private lateinit var locationText: TextView
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        locationText = findViewById(R.id.locationText)
+
+        setupSDK()
+        setupPermissions()
+    }
+
+    private fun setupSDK() {
+        // Initialize SDK with key (if not in manifest)
+        LocalSDK.initialize(this, "YOUR_SDK_KEY_HERE")
+
+        val config = Config.Builder()
+            .setTrackingMode(TrackingMode.STANDARD)
+            .setForegroundServiceEnabled(true)
+            .setUpdateIntervalMs(10000)
+            .build()
+
+        LocalSDK.setConfig(config)
+    }
+
+    private fun setupPermissions() {
+        if (LocationPermissions.checkLocationPermission(this)) {
+            startTracking()
+        } else {
+            LocationPermissions.requestLocationPermission(this) { granted ->
+                if (granted) startTracking()
+            }
+        }
+    }
+
+    private fun startTracking() {
+        LocalSDK.onLocation { location ->
+            runOnUiThread {
+                locationText.text = "Lat: ${location.latitude}\nLng: ${location.longitude}"
+            }
+        }
+
+        LocalSDK.onError { error ->
+            Log.e("LocalSDK", "Error: ${error.message}", error.cause)
+        }
+
+        LocalSDK.startTracking()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        LocalSDK.stopTracking()
+    }
+}</code></pre>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark text-white">
+        <div class="container">
+            <div class="text-center">
+                <p class="mb-0">&copy; 2025 LocalSDK. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/kotlin.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/xml.min.js"></script>
+    <script>
+        hljs.highlightAll();
+    </script>
+</body>
+</html>
