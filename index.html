@@ -343,7 +343,7 @@ class MainActivity : AppCompatActivity() {
 
         // Error callback
         LocalSDK.onError { error ->
-            Log.e("LocalSDK", "Error: ${error.message}", error.cause)
+            Log.e("LocalSDK", "Error: $error")
         }
 
         // Start tracking
